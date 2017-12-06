@@ -1,19 +1,21 @@
 module shiftedcg
     function solve(mat_A,n,b,vec_σ,N,eps=1e-12)
-        x = zeros(Float64,n)
-        r = zeros(Float64,n)
-        p = zeros(Float64,n)
-        Ap = zeros(Float64,n)
+        tb = typeof(b[1]) 
+        x = zeros(tb,n)
+        r = zeros(tb,n)
+        p = zeros(tb,n)
+        Ap = zeros(tb,n)
         r[:] = b[:]
         p[:] = b[:]
         αm = 1.0
         βm = 0.0
-        vec_x = zeros(Float64,n,N)
-        vec_r = zeros(Float64,n,N)
-        vec_p = zeros(Float64,n,N)
-        ρm = ones(Float64,N)
-        ρ0 = ones(Float64,N)
-        ρp = ones(Float64,N)
+        tσ = typeof(vec_σ[1])
+        vec_x = zeros(tσ,n,N)
+        vec_r = zeros(tσ,n,N)
+        vec_p = zeros(tσ,n,N)
+        ρm = ones(tσ,N)
+        ρ0 = ones(tσ,N)
+        ρp = ones(tσ,N)
         for j in 1:N
             vec_r[:,j] = b[:] 
             vec_p[:,j] = b[:] 
@@ -21,8 +23,8 @@ module shiftedcg
 
         k = 0
         hi = 1.0
-        println(eps)
-        println(hi)
+#        println(eps)
+#        println(hi)
         while abs(hi) > eps
             Ap = mat_A*p
             pAp = p'*Ap
