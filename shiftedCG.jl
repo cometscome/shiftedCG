@@ -58,7 +58,7 @@ module shiftedcg
             hi = rr*ρMAX
             #println(hi," ",k)
             k +=1
-            if k > 10*N
+            if k > 10*n
                 println(hi," ",k)
                 println("not converged! there might be zero eigenvalue")
                 conv = false
