@@ -1,5 +1,7 @@
 module shiftedcg
     function solve(mat_A,n,b,vec_σ,N,eps=1e-12)
+        println("--------------------------------------------------------")
+        println("Solving linear equations with the shifted CG method...")
         tb = typeof(b[1]) 
         x = zeros(tb,n)
         r = zeros(tb,n)
@@ -62,8 +64,12 @@ module shiftedcg
             #println(hi," ",k)
             k +=1
         end
+        println("done.")
         println("error = ",hi)
         println("Num. of iterations = ", k)
+
+        println("--------------------------------------------------------")
+        
 
         return vec_x,x
     end
