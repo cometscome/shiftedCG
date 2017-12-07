@@ -39,39 +39,41 @@ module shiftedcg
             for j in 1:N
                 ρkj = ρ0[j]
                 ρkmj =ρm[j]
-                if abs(ρkj) > eps
-                    ρp[j] = ρkj*ρkmj*αm/(ρkmj*αm*(1.0+αk*vec_σ[j])+αk*βm*(ρkmj-ρkj))
-                    αkj = (ρp[j]/ρkj)*αk
-                else
-                    ρp[j] = ρkj
-                    αkj = 0.0
-                end
+                ρp[j] = ifelse(abs(ρkj) > eps,ρkj*ρkmj*αm/(ρkmj*αm*(1.0+αk*vec_σ[j])+αk*βm*(ρkmj-ρkj)),ρkj)
+                αkj = ifelse(abs(ρkj) > eps,(ρp[j]/ρkj)*αk,0.0)
+
 
                 vec_x[:,j] = vec_x[:,j]+αkj*vec_p[:,j]
                 βkj = (ρp[j]/ρkj)^2*βk
-                if abs(ρkj) > eps 
-                    vec_p[:,j] = ρp[j]*r+βkj*vec_p[:,j]
-                end
-                #println("j=",j," ",ρp[j])
+                vec_p[:,j] = ifelse(abs(ρkj) > eps,ρp[j]*r+βkj*vec_p[:,j],vec_p[:,j])
+
             end
 
             ρm[:] = ρ0[:]
             ρ0[:] = ρp[:]
             αm = αk
             βm = βk
-
-            hi = rr
+    
+            ρMAX = maximum(abs.(ρp))^2
+            hi = rr*ρMAX
             #println(hi," ",k)
             k +=1
+            if k > 10*N
+                println(hi," ",k)
+                println("not converged! there might be zero eigenvalue")
+                conv = false
+                return vec_x,x,conv
+            end
         end
         println("done.")
         println("error = ",hi)
         println("Num. of iterations = ", k)
+        conv = true
 
         println("--------------------------------------------------------")
         
 
-        return vec_x,x
+        return vec_x,x,conv
     end
 
 
