@@ -28,29 +28,52 @@ module shiftedcg
 #        println(eps)
 #        println(hi)
         while abs(hi) > eps
-            Ap = mat_A*p
+            A_mul_B!(Ap,mat_A,p)
+            #Ap = mat_A*p
             pAp = p'*Ap
             rr = r'*r
             αk = rr/pAp
-            x += αk*p
-            r += -αk*Ap
+
+            for i=1:n
+                x[i] = αk*p[i]
+                r[i] += -αk*Ap[i]
+            end
+
+            #x += αk*p
+            #r += -αk*Ap
             βk = r'*r/rr
-            p = r + βk*p
+
+            for i=1:n
+                p[i] = r[i] + βk*p[i]
+            end
+            #p = r + βk*p
             for j in 1:N
                 ρkj = ρ0[j]
                 ρkmj =ρm[j]
                 ρp[j] = ifelse(abs(ρkj) > eps,ρkj*ρkmj*αm/(ρkmj*αm*(1.0+αk*vec_σ[j])+αk*βm*(ρkmj-ρkj)),ρkj)
                 αkj = ifelse(abs(ρkj) > eps,(ρp[j]/ρkj)*αk,0.0)
 
-
-                vec_x[:,j] = vec_x[:,j]+αkj*vec_p[:,j]
+                for i=1:n
+                    vec_x[i,j] += αkj*vec_p[i,j]
+                end
+                
                 βkj = (ρp[j]/ρkj)^2*βk
-                vec_p[:,j] = ifelse(abs(ρkj) > eps,ρp[j]*r+βkj*vec_p[:,j],vec_p[:,j])
+                if abs(ρkj) > eps
+                    for i=1:n
+                        vec_p[i,j] = ρp[j]*r[i]+βkj*vec_p[i,j]
+                    end   
+                end
+                
 
             end
 
-            ρm[:] = ρ0[:]
-            ρ0[:] = ρp[:]
+            for i=1:N
+                ρm[i] = ρ0[i] 
+                ρ0[i] = ρp[i]
+            end  
+
+            
+            
             αm = αk
             βm = βk
     
